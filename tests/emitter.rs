@@ -51,6 +51,25 @@ mod async_event_emitter {
     }
 
     #[tokio::test]
+    async fn test_var_mutation() -> anyhow::Result<()> {
+        let mut evt_emitter = AsyncEventEmitter::new();
+        let mut date = Date {
+            month: "January".to_string(),
+            day: "Tuesday".to_string(),
+        };
+
+        evt_emitter.on("CHANGE_DATE", |month: String| async move {
+            date.month = month;
+        });
+
+        evt_emitter.emit("CHANGE_DATE", "Feb".to_string()).await?;
+        println!("{:#?}", evt_emitter);
+        assert_eq!(date.month, "Feb".to_string());
+
+        Ok(())
+    }
+
+    #[tokio::test]
     async fn test_emit_multiple_args() -> anyhow::Result<()> {
         let mut event_emitter = AsyncEventEmitter::new();
         let time = Time {
